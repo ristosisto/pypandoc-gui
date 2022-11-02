@@ -97,11 +97,12 @@ root = Tk()
 root.geometry("300x200") #TODO change size to fit the full file path so the user doesn't have to resize
 root.title("PyPandoc-Gui") #maybe change name
 clicked = StringVar()
+clicked.set("Pick desired file type") #sets the initial string that shows on the dropdown menu
 
 file_button = Button(root, text="Pick File", command=pick_file).pack()
 picked_file = Label(root, text="")
 
-drop = OptionMenu(root, clicked, *options) #TODO make a label for this so people know what this is
+drop = OptionMenu(root, clicked, *options) 
 
 #TODO allow for the user to choose where they want their new file to be located 
 #t=Text(root, height=1, width=20)
@@ -122,6 +123,9 @@ dict_endings = { #TODO update this to include all the available file types
     "epub": ".epub"
 }
 
+success_label = Label(root, text = "")
+
+#may want to abstract this function and remove the gui stuff so the funcion will run with unit tests
 def convert(filename, output):
     #run the pandoc command in the terminal 
     output_format = dict_endings.get(output) #TODO put an error exception here
@@ -129,15 +133,15 @@ def convert(filename, output):
     print(file)
     command = "pandoc -s " + filen.name + " -o " + file
     os.system(command)
-    #TODO create a tkinter label to tell the user if this command was successful
-
+    if os.path.exists(file):
+        success_label.config(text="File has been successfully converted")
+    else:
+        success_label.config(text="Error! File was unable to be successfully converted")
+    success_label.pack()
+    
 def run_convert():
     convert(filen.name, clicked.get())
 
 
-def file_ending(output):
-    f =1
-
 convert_button = Button(root, text = "Convert", command=run_convert)
 root.mainloop()
-
