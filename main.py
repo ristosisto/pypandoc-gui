@@ -13,6 +13,7 @@ import subprocess
 #options_string = subprocess.check_output(["pandoc", "--list-output-formats"]) #TODO if this output fails, then the user does not have pandoc installed. Prompt the user to install pandoc
 #options_string = options_string.decode("utf-8")
 
+
 options = [
     #"asciidoc",
     #"asciidoctor",
@@ -81,7 +82,16 @@ class filename:
     def __init__(self):
         self.name = ""
     def update_name(self, name):
-        self.name = name 
+        self.name = self.cleanup_name(name)
+        print("name:" + self.name)
+    def cleanup_name(self, name):
+        name = name.split("/")
+        t2 = []
+        for x in name:
+            t2.append("/" + "'" + x + "'")
+        t2 = t2[1:]
+        l = ""
+        return l.join(t2)
 
 filen = filename()
 def pick_file():
@@ -129,11 +139,12 @@ success_label = Label(root, text = "")
 def convert(filename, output):
     #run the pandoc command in the terminal 
     output_format = dict_endings.get(output) #TODO put an error exception here
-    file = filename.split(".")[0] + output_format #TODO make sure that the correct output format is given (not all file endings are the same as the name in the list)
-    print(file)
+    file = filename.split(".")[0] + output_format + "'"#TODO make sure that the correct output format is given (not all file endings are the same as the name in the list)
+    print("file: " + file)
     command = "pandoc -s " + filen.name + " -o " + file
     os.system(command)
-    if os.path.exists(file):
+    print(file)
+    if os.path.exists(file): #TODO this does not return True if the filename has spaces in it
         success_label.config(text="File has been successfully converted")
     else:
         success_label.config(text="Error! File was unable to be successfully converted")
